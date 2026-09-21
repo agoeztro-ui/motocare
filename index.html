@@ -1,47 +1,54 @@
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<link rel="manifest" href="manifest.webmanifest">
-<title>Reminder Ganti Oli</title>
+<!doctype html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827"><link rel="manifest" href="manifest.webmanifest">
+<title>MotoCare</title>
 <style>
-body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}
-main{max-width:520px;margin:auto}.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px #0001}
-h1{margin:0 0 5px;font-size:25px}.muted{color:#6b7280;font-size:14px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
-input{width:100%;box-sizing:border-box;padding:13px;border:1px solid #d1d5db;border-radius:12px;font-size:16px}
-button{border:0;border-radius:12px;padding:13px 16px;font-weight:700;font-size:15px;margin-top:10px}
-.primary{width:100%;background:#111827;color:#fff}.secondary{background:#eef2f7}
-.big{font-size:32px;font-weight:800}.status{margin-top:12px;padding:13px;border-radius:12px;background:#eef2f7;font-weight:700}
-@media(max-width:420px){.grid{grid-template-columns:1fr}}
-</style>
-</head>
-<body><main>
-<section class="card"><h1>🛵 Reminder Ganti Oli</h1><div class="muted">Vario 125 • reset setiap habis ganti oli</div></section>
-<section class="card"><div class="grid">
-<div><label>KM saat ganti terakhir</label><input id="lastKm" type="number" min="0" value="0"></div>
-<div><label>Interval KM</label><input id="intervalKm" type="number" min="100" value="3000"></div>
-<div><label>Tanggal ganti terakhir</label><input id="lastDate" type="date"></div>
-<div><label>Interval waktu (bulan)</label><input id="months" type="number" min="1" value="6"></div>
-</div>
-<button class="primary" id="save">🔄 Sudah Ganti Oli — Reset</button>
-<button class="secondary" id="notify">🔔 Aktifkan Notifikasi</button></section>
-<section class="card"><div class="muted">Ganti berikutnya pada KM</div><div class="big" id="target">3.000 km</div><div class="muted" id="dateTarget">atau -</div><div class="status" id="status">Masukkan KM sekarang.</div></section>
-<section class="card"><label>KM sekarang</label><input id="currentKm" type="number" min="0" placeholder="Contoh: 85.000"><button class="secondary" id="check">Cek Status</button></section>
-<section class="card muted">Notifikasi akan digunakan untuk mengingatkan saat mendekati batas KM/waktu. Di iPhone, notifikasi web memerlukan aplikasi dipasang ke Home Screen dan izin notifikasi.</section>
+*{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#111827;color:#fff;padding:24px 18px 16px;border-radius:0 0 26px 26px}h1{margin:0;font-size:30px}.sub{color:#cbd5e1}
+nav{display:flex;gap:8px;margin-top:16px}nav button{flex:1;padding:12px;border:0;border-radius:13px;background:#374151;color:#ddd;font-weight:700}nav button.active{background:#fff;color:#111827}
+main{max-width:760px;margin:auto;padding:15px}.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 3px 14px #0000000a}
+label{display:block;font-weight:700;margin:12px 0 6px}input,select{width:100%;padding:14px;border:1px solid #d1d5db;border-radius:13px;font-size:16px}
+.primary{width:100%;padding:14px;margin-top:13px;border:0;border-radius:14px;background:#111827;color:#fff;font-size:16px;font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.big{font-size:28px;font-weight:850}.muted{color:#6b7280}.hidden{display:none}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.income{color:#15803d}.expense{color:#dc2626}
+.item{padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border:0}.empty{text-align:center;color:#6b7280;padding:20px}
+.secondary{border:0;border-radius:10px;padding:9px 11px;font-weight:700}
+</style></head><body>
+<header><h1>🛵 MotoCare</h1><div class="sub">Maintenance + Cashflow</div>
+<nav><button id="bm" class="active" onclick="tab('moto')">🛵 Kendaraan</button><button id="bf" onclick="tab('finance')">💰 Cashflow</button></nav></header>
+<main>
+<section id="moto"><div class="card"><h2>🛢️ Reminder Ganti Oli</h2><div class="muted">Vario 125</div>
+<label>KM saat ganti terakhir</label><input id="lastKm" type="number" inputmode="numeric">
+<label>Interval KM</label><input id="intervalKm" type="number" value="2500">
+<label>Tanggal ganti terakhir</label><input id="lastDate" type="date">
+<label>Interval waktu (bulan)</label><input id="intervalMonth" type="number" value="6">
+<button class="primary" onclick="saveOil()">💾 Simpan Data</button>
+<button class="primary" onclick="resetOil()">🔄 Sudah Ganti Oli — Reset</button></div>
+<div class="card"><div class="muted">Ganti berikutnya pada KM</div><div class="big" id="nextKm">-</div><div class="muted" id="nextDate">atau -</div></div></section>
+
+<section id="finance" class="hidden"><div class="card"><h2>💰 Cashflow</h2><div class="muted">Catat pemasukan dan pengeluaran.</div>
+<div class="grid"><div><label>Jenis</label><select id="type"><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select></div>
+<div><label>Kategori</label><input id="cat" placeholder="Gaji / Bensin"></div></div>
+<label>Nominal (Rp)</label><input id="amt" type="number" inputmode="numeric" placeholder="0">
+<label>Catatan</label><input id="note" placeholder="Opsional">
+<button class="primary" onclick="addTx()">➕ Tambah Transaksi</button></div>
+<div class="card"><div class="grid"><div><div class="muted">Pemasukan</div><div class="big income" id="inc">Rp0</div></div>
+<div><div class="muted">Pengeluaran</div><div class="big expense" id="exp">Rp0</div></div></div><hr><div class="muted">Sisa Cashflow</div><div class="big" id="bal">Rp0</div></div>
+<div class="card"><div class="row"><h2>📋 Transaksi</h2><button class="secondary" onclick="clearTx()">Hapus Semua</button></div><div id="list"></div></div></section>
 </main>
 <script>
-const $=id=>document.getElementById(id), fmt=n=>new Intl.NumberFormat('id-ID').format(Math.max(0,Math.round(n))), today=()=>new Date().toISOString().slice(0,10);
-function addMonths(s,m){let [y,mo,d]=s.split('-').map(Number),x=new Date(Date.UTC(y,mo-1,d));x.setUTCMonth(x.getUTCMonth()+m);return x.toISOString().slice(0,10)}
-function pretty(s){if(!s)return '-';let [y,m,d]=s.split('-');return d+'-'+m+'-'+y}
-function get(){return {lastKm:Number($('lastKm').value)||0,intervalKm:Number($('intervalKm').value)||3000,lastDate:$('lastDate').value||today(),months:Number($('months').value)||6,currentKm:Number($('currentKm').value)||0}}
-function update(){let s=get(),target=s.lastKm+s.intervalKm,td=addMonths(s.lastDate,s.months);$('target').textContent=fmt(target)+' km';$('dateTarget').textContent='atau '+pretty(td);let msg='Masukkan KM sekarang.';if(s.currentKm){let rem=target-s.currentKm;if(rem<=0)msg='🔴 Sudah waktunya ganti oli berdasarkan KM.';else if(new Date()>=new Date(td+'T23:59:59'))msg='🔴 Sudah waktunya ganti oli berdasarkan waktu.';else if(rem<=500)msg='🟡 Segera ganti oli — sisa '+fmt(rem)+' km.';else msg='🟢 Masih aman — sisa '+fmt(rem)+' km.'}$('status').textContent=msg}
-function save(){localStorage.setItem('oilReminder',JSON.stringify(get()));update();$('status').textContent='✅ Reminder di-reset dari KM dan tanggal terakhir.';scheduleLocalReminder()}
-function load(){let s=JSON.parse(localStorage.getItem('oilReminder')||'null');if(s){$('lastKm').value=s.lastKm;$('intervalKm').value=s.intervalKm;$('lastDate').value=s.lastDate;$('months').value=s.months;$('currentKm').value=s.currentKm||''}if(!$('lastDate').value)$('lastDate').value=today();update()}
-async function enableNotifications(){if(!('Notification'in window)){alert('Browser ini tidak mendukung notifikasi web.');return}let p=await Notification.requestPermission();if(p==='granted'){alert('Notifikasi diizinkan. Untuk notifikasi otomatis di iPhone, pasang aplikasi ini ke Home Screen.');scheduleLocalReminder()}else alert('Izin notifikasi belum diberikan.')}
-function scheduleLocalReminder(){/* Reminder status tetap tersedia saat app dibuka; background notification memerlukan service worker + HTTPS hosting. */ if('serviceWorker'in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{})}
-$('save').onclick=save;$('check').onclick=update;$('notify').onclick=enableNotifications;['lastKm','intervalKm','lastDate','months','currentKm'].forEach(id=>$(id).addEventListener('input',update));load();scheduleLocalReminder();
-</script>
-</body></html>
+const $=id=>document.getElementById(id),today=()=>new Date().toISOString().slice(0,10);
+const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
+function tab(x){$('moto').classList.toggle('hidden',x!='moto');$('finance').classList.toggle('hidden',x!='finance');$('bm').classList.toggle('active',x=='moto');$('bf').classList.toggle('active',x=='finance')}
+let oil=JSON.parse(localStorage.getItem('mc_oil')||'null')||{lastKm:0,intervalKm:2500,lastDate:today(),intervalMonth:6};
+function loadOil(){$('lastKm').value=oil.lastKm;$('intervalKm').value=oil.intervalKm;$('lastDate').value=oil.lastDate;$('intervalMonth').value=oil.intervalMonth;renderOil()}
+function saveOil(){oil={lastKm:+$('lastKm').value||0,intervalKm:+$('intervalKm').value||2500,lastDate:$('lastDate').value||today(),intervalMonth:+$('intervalMonth').value||6};localStorage.setItem('mc_oil',JSON.stringify(oil));renderOil()}
+function addMonths(s,m){let d=new Date(s+'T00:00:00');d.setMonth(d.getMonth()+m);return d}
+function renderOil(){let d=addMonths(oil.lastDate,oil.intervalMonth);$('nextKm').textContent=(oil.lastKm+oil.intervalKm).toLocaleString('id-ID')+' km';$('nextDate').textContent='atau '+d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}
+function resetOil(){oil.lastKm=(+$('lastKm').value||0)+(+$('intervalKm').value||2500);oil.lastDate=today();localStorage.setItem('mc_oil',JSON.stringify(oil));loadOil()}
+let tx=JSON.parse(localStorage.getItem('mc_tx')||'[]');
+function addTx(){let amount=+$('amt').value;if(amount<=0)return alert('Masukkan nominal.');tx.unshift({type:$('type').value,cat:$('cat').value||'Lainnya',amount,note:$('note').value,date:today()});localStorage.setItem('mc_tx',JSON.stringify(tx));$('amt').value='';$('note').value='';renderTx()}
+function renderTx(){let i=tx.filter(x=>x.type=='income').reduce((a,x)=>a+x.amount,0),e=tx.filter(x=>x.type=='expense').reduce((a,x)=>a+x.amount,0);$('inc').textContent=rp(i);$('exp').textContent=rp(e);$('bal').textContent=rp(i-e);$('list').innerHTML=tx.length?tx.map(x=>`<div class="item"><div class="row"><b>${x.cat}</b><b class="${x.type}">${x.type=='income'?'+':'-'} ${rp(x.amount)}</b></div><div class="muted">${x.date}${x.note?' • '+x.note:''}</div></div>`).join(''):'<div class="empty">Belum ada transaksi.</div>'}
+function clearTx(){if(confirm('Hapus semua transaksi?')){tx=[];localStorage.setItem('mc_tx','[]');renderTx()}}
+loadOil();renderTx();
+</script></body></html>
